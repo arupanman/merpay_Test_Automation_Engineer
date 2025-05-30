@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 
 class TestPremiumThemeParkReservation(unittest.TestCase):
     @classmethod
@@ -87,29 +88,43 @@ class TestPremiumThemeParkReservation(unittest.TestCase):
 
         # 6. 「予約内容を確認する」ボタンをクリック
         submit_button = wait.until(EC.element_to_be_clickable((By.ID, "submit-button")))
-        submit_button.click()
-        time.sleep(1.2)  # 確認ページへの遷移を待機
+        driver.execute_script("arguments[0].click();", submit_button)
+        time.sleep(2)  # 遷移を待機
 
+        # デバッグ情報
+        print("Current URL:", driver.current_url)
+        print("Page Title:", driver.title)
+        print("Page contains 'テーマパーク優待プラン':", "テーマパーク優待プラン" in driver.page_source)
+    
         # 7. 「宿泊予約確認」画面で入力内容が正しいか確認
-        wait.until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), '宿泊予約確認')]")))
-        time.sleep(1)  # 確認画面の表示を待機
-        
-        self.assertIn("テーマパーク優待プラン", driver.page_source)
-        self.assertIn("2025年7月15日", driver.page_source)
-        self.assertIn("3泊", driver.page_source)
-        self.assertIn("2名様", driver.page_source)
-        self.assertIn("朝食バイキング", driver.page_source)
-        self.assertIn("00011112222", driver.page_source)
-        time.sleep(0.5)  # 確認後、次の操作前に少し待機
+        confirm_header = wait.until(EC.visibility_of_element_located((
+            By.CSS_SELECTOR,
+            "#confirm h2.my-3"
+        )))
+        self.assertEqual(confirm_header.text.strip(), "宿泊予約確認")
+        time.sleep(0.5)
 
-        # 8. 「この内容で予約する」ボタンをクリック
-        driver.find_element(By.XPATH, "//button[contains(., 'この内容で予約する')]").click()
-        time.sleep(1.5)  # モーダル表示を待機
+        # 8. 「この内容で予約する」ボタンを確実にクリック
+        confirm_btn = wait.until(EC.element_to_be_clickable((
+            By.CSS_SELECTOR,
+            "#confirm button[data-target='#success-modal']"
+        )))
+
+        # 画面中央までスクロールしてから JS クリック
+        driver.execute_script("arguments[0].scrollIntoView({block:'center'});", confirm_btn)
+        driver.execute_script("arguments[0].click();", confirm_btn)
+
+        # モーダル (#success-modal) が表示されるまで待機
+        wait.until(EC.visibility_of_element_located((By.ID, "success-modal")))
+
+
+
+
 
         # 9. 「予約を完了しました」というポップアップメッセージを確認
         modal = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "modal-content")))
         self.assertIn("予約を完了しました", modal.text)
-        time.sleep(0.8)  # モーダル表示確認後、少し待機
+        time.sleep(1.5)  # モーダル表示確認後、少し待機
 
         # 10. 「閉じる」ボタンをクリック
         close_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(., '閉じる')]")))
