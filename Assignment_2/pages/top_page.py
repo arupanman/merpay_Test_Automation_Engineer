@@ -85,3 +85,17 @@ class TopPage(BasePage):
         time.sleep(1)  # ログアウト処理の完了を待機
         
         return self
+    
+    def go_to_signup(self):
+        """会員登録ページへ移動
+        
+        Returns:
+            SignupPage: 会員登録ページのオブジェクト
+        """
+        # 会員登録リンクをクリック
+        signup_link = self.wait_for_clickable(By.LINK_TEXT, "会員登録")
+        signup_link.click()
+        time.sleep(1)  # ページ遷移を待機
+        
+        from pages.signup_page import SignupPage  # 循環インポートを避けるため、ここでインポート
+        return SignupPage(self.driver)

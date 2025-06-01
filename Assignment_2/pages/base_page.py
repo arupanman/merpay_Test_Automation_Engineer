@@ -43,14 +43,20 @@ class BasePage:
         """
         return self.wait.until(EC.visibility_of_element_located((by, value)))
     
-    def wait_for_clickable(self, by, value):
-        """要素がクリック可能になるまで待機して、要素を返す
+    def wait_for_clickable(self, by, value, timeout=10):
+        """要素がクリック可能になるまで待機
         
         Args:
-            by: locator type
-            value: locator value
+            by: 要素を特定する方法（By.ID, By.CSS_SELECTOR など）
+            value: 要素を特定する値
+            timeout: タイムアウト（秒）
             
         Returns:
             WebElement: 見つかった要素
         """
-        return self.wait.until(EC.element_to_be_clickable((by, value)))
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        
+        return WebDriverWait(self.driver, timeout).until(
+            EC.element_to_be_clickable((by, value))
+        )
