@@ -57,3 +57,31 @@ class TopPage(BasePage):
         self.driver.execute_script("document.querySelector('a.nav-link[href=\"./plans.html\"]').click();")
         time.sleep(1.5)  # 宿泊予約ページへの遷移完了を待機
         return PlansPage(self.driver)
+    
+
+    def go_to_mypage(self):
+        """
+        マイページに移動
+        
+        Returns:
+            TopPage: 自身のインスタンス
+        """
+        # マイページへのリンクをクリック
+        mypage_link = self.wait_for_clickable(By.CSS_SELECTOR, "a.nav-link[href='./mypage.html']")
+        mypage_link.click()
+        time.sleep(1)  # ページ遷移を待機
+        return self
+
+    def logout(self):
+        """
+        ログアウト処理を実行
+        
+        Returns:
+            TopPage: 自身のインスタンス
+        """
+        # ログアウトボタンをクリック
+        logout_button = self.wait_for_clickable(By.CSS_SELECTOR, "button.btn.btn-outline-success")
+        logout_button.click()
+        time.sleep(1)  # ログアウト処理の完了を待機
+        
+        return self
