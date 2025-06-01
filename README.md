@@ -38,3 +38,7 @@ python Assignment_2_test_login_users.py
 誕生日が未来でも会員登録できてしまうことを確認
 ## 課題2_3 実行コマンド
 python Assignment_2_test_birthday.py
+
+
+### プロンプトについて
+エラーが発生した際に、HTMLとpythonコードを送りエラーを直してもらいました
